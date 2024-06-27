@@ -10,10 +10,16 @@ namespace Dyternal.EditorTools.InputDialog
 {
     public class EditorInputDialog : EditorWindow
     {
-        public bool Result { get; private set; }
+        public ResultType Result { get; private set; }
         public string InputText { get; private set; } = null;
 
-        public static EditorInputDialog Show(string title, string desc, string OKButtonText = "OK", string CancelButtonText = "Cancel")
+        public enum ResultType
+        {
+            OK,
+            Cancel
+        };
+
+        public static EditorInputDialog Show(string title, string desc, string OKButtonText = "OK", string CancelButtonText = null)
         {
             EditorInputDialog wnd = CreateInstance<EditorInputDialog>();
             wnd.titleContent = new GUIContent(title);
@@ -49,15 +55,17 @@ namespace Dyternal.EditorTools.InputDialog
             buttonOK.style.height = new Length(20, LengthUnit.Pixel);
             buttonOK.style.marginTop = 10;
             buttonOK.text = OKButtonText;
-
-            Button buttonCancel = new Button(() => CancelButtonCallback(wnd));
-            buttonCancel.style.width = new Length(100, LengthUnit.Pixel);
-            buttonCancel.style.height = new Length(20, LengthUnit.Pixel);
-            buttonCancel.style.marginTop = 10;
-            buttonCancel.text = CancelButtonText;
-
             buttons_Box.Add(buttonOK);
-            buttons_Box.Add(buttonCancel);
+
+            if (CancelButtonText != null)
+            {
+                Button buttonCancel = new Button(() => CancelButtonCallback(wnd));
+                buttonCancel.style.width = new Length(100, LengthUnit.Pixel);
+                buttonCancel.style.height = new Length(20, LengthUnit.Pixel);
+                buttonCancel.style.marginTop = 10;
+                buttonCancel.text = CancelButtonText;
+                buttons_Box.Add(buttonCancel);
+            }
 
             root.Add(descLabel);
             root.Add(textInput);
@@ -93,12 +101,12 @@ namespace Dyternal.EditorTools.InputDialog
 
             wnd.InputText = textField.text;
             wnd.Close();
-            wnd.Result = true;
+            wnd.Result = ResultType.OK;
         }
         private static void CancelButtonCallback(EditorInputDialog wnd)
         {
             wnd.Close();
-            wnd.Result = false;
+            wnd.Result = ResultType.Cancel;
             wnd.InputText = null;
         }
     }
