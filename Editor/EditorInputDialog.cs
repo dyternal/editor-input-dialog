@@ -13,6 +13,8 @@ namespace Dyternal.EditorTools.InputDialog
         public ResultType Result { get; private set; }
         public string InputText { get; private set; } = null;
 
+        private static EditorInputDialog wnd;
+
         public enum ResultType
         {
             OK,
@@ -21,7 +23,7 @@ namespace Dyternal.EditorTools.InputDialog
 
         public static EditorInputDialog Show(string title, string desc, string OKButtonText = "OK", string CancelButtonText = null)
         {
-            EditorInputDialog wnd = CreateInstance<EditorInputDialog>();
+            wnd = CreateInstance<EditorInputDialog>();
             wnd.titleContent = new GUIContent(title);
 
             VisualElement root = wnd.rootVisualElement;
@@ -50,7 +52,7 @@ namespace Dyternal.EditorTools.InputDialog
             buttons_Box.style.justifyContent = Justify.FlexEnd;
             buttons_Box.style.flexDirection = FlexDirection.Row;
 
-            Button buttonOK = new Button(() => OKButtonCallback(wnd));
+            Button buttonOK = new Button(() => OKButtonCallback());
             buttonOK.style.width = new Length(100, LengthUnit.Pixel);
             buttonOK.style.height = new Length(20, LengthUnit.Pixel);
             buttonOK.style.marginTop = 10;
@@ -59,7 +61,7 @@ namespace Dyternal.EditorTools.InputDialog
 
             if (CancelButtonText != null)
             {
-                Button buttonCancel = new Button(() => CancelButtonCallback(wnd));
+                Button buttonCancel = new Button(() => CancelButtonCallback());
                 buttonCancel.style.width = new Length(100, LengthUnit.Pixel);
                 buttonCancel.style.height = new Length(20, LengthUnit.Pixel);
                 buttonCancel.style.marginTop = 10;
@@ -71,7 +73,7 @@ namespace Dyternal.EditorTools.InputDialog
             root.Add(textInput);
             root.Add(buttons_Box);
 
-            root.RegisterCallback<GeometryChangedEvent>(evt => SetWindowHeight(root, wnd));
+            root.RegisterCallback<GeometryChangedEvent>(evt => SetWindowHeight(root));
 
             wnd.ShowModal();
 
@@ -79,7 +81,7 @@ namespace Dyternal.EditorTools.InputDialog
         }
         
         // Events
-        private static void SetWindowHeight(VisualElement root, EditorWindow wnd)
+        private static void SetWindowHeight(VisualElement root)
         {
             float neededHeight = 0;
             foreach (var element in root.Children()) neededHeight += element.resolvedStyle.height + element.resolvedStyle.marginTop;
@@ -94,7 +96,7 @@ namespace Dyternal.EditorTools.InputDialog
 
             root.UnregisterCallback<GeometryChangedEvent>(null);
         }
-        private static void OKButtonCallback(EditorInputDialog wnd)
+        private static void OKButtonCallback()
         {
             TextField textField = wnd.rootVisualElement.Q<TextField>();
             if (textField.text == "") return;
@@ -103,7 +105,7 @@ namespace Dyternal.EditorTools.InputDialog
             wnd.Close();
             wnd.Result = ResultType.OK;
         }
-        private static void CancelButtonCallback(EditorInputDialog wnd)
+        private static void CancelButtonCallback()
         {
             wnd.Close();
             wnd.Result = ResultType.Cancel;
