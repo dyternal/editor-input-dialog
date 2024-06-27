@@ -38,7 +38,7 @@ public static EditorInputDialog Show(string title, string desc, string OKButtonT
 - `string InputText`: The text entered by the user.
 - `ResultType Result`: The result of the dialog. It can be `ResultType.OK` or `ResultType.Cancel`.
 
-# Usage Example:
+## Usage Example:
 ```csharp
 EditorInputDialog myInputDialog = EditorInputDialog.Show("Title", "Description", "OK", "Cancel");
 if(myInputDialog.Result == EditorInputDialog.ResultType.OK)
