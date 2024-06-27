@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -27,26 +28,26 @@ namespace Dyternal.EditorTools.InputDialog
             wnd.titleContent = new GUIContent(title);
 
             VisualElement root = wnd.rootVisualElement;
-
+            
             root.style.paddingTop = 10;
             root.style.paddingBottom = 10;
             root.style.paddingLeft = 10;
             root.style.paddingRight = 10;
-
+            
             Label descLabel = new Label(desc);
-            descLabel.name = "desc-label";
+            
             descLabel.style.textOverflow = TextOverflow.Clip;
             descLabel.style.whiteSpace = WhiteSpace.Normal;
             descLabel.style.width = new Length(350, LengthUnit.Pixel);
 
             TextField textInput = new TextField();
-            textInput.name = "text-input";
+
             textInput.style.width = new Length(350, LengthUnit.Pixel);
+            textInput.style.height = new Length(20, LengthUnit.Pixel);
             textInput.style.marginTop = 10;
 
-            VisualElement buttons_Box = new VisualElement();
-            
-            buttons_Box.name = "buttons-box";
+            GroupBox buttons_Box = new GroupBox();
+
             buttons_Box.style.width = new Length(100, LengthUnit.Percent);
             buttons_Box.style.height = new Length(30, LengthUnit.Pixel);
             buttons_Box.style.justifyContent = Justify.FlexEnd;
@@ -55,20 +56,18 @@ namespace Dyternal.EditorTools.InputDialog
             Button buttonOK = new Button(() => OKButtonCallback());
             buttonOK.style.width = new Length(100, LengthUnit.Pixel);
             buttonOK.style.height = new Length(20, LengthUnit.Pixel);
-            buttonOK.style.marginTop = 10;
             buttonOK.text = OKButtonText;
             buttons_Box.Add(buttonOK);
 
             if (CancelButtonText != null)
             {
-                Button buttonCancel = new Button(() => CancelButtonCallback());
+                Button buttonCancel = new Button(() => wnd.Close());
                 buttonCancel.style.width = new Length(100, LengthUnit.Pixel);
                 buttonCancel.style.height = new Length(20, LengthUnit.Pixel);
-                buttonCancel.style.marginTop = 10;
                 buttonCancel.text = CancelButtonText;
                 buttons_Box.Add(buttonCancel);
             }
-
+            
             root.Add(descLabel);
             root.Add(textInput);
             root.Add(buttons_Box);
@@ -76,17 +75,23 @@ namespace Dyternal.EditorTools.InputDialog
             root.RegisterCallback<GeometryChangedEvent>(evt => SetWindowHeight(root));
 
             wnd.ShowModal();
-
+            
             return wnd;
         }
-        
+
+        private void OnDisable()
+        {
+            wnd.Result = ResultType.Cancel;
+            wnd.InputText = null;
+        }
+
         // Events
         private static void SetWindowHeight(VisualElement root)
         {
             float neededHeight = 0;
             foreach (var element in root.Children()) neededHeight += element.resolvedStyle.height + element.resolvedStyle.marginTop;
-            
-            neededHeight += root.resolvedStyle.paddingTop + root.resolvedStyle.paddingBottom + 1;
+
+            neededHeight += root.resolvedStyle.paddingTop + root.resolvedStyle.paddingBottom;
 
             wnd.minSize = new Vector2(370, neededHeight);
             wnd.maxSize = wnd.minSize;
@@ -101,15 +106,10 @@ namespace Dyternal.EditorTools.InputDialog
             TextField textField = wnd.rootVisualElement.Q<TextField>();
             if (textField.text == "") return;
 
+            wnd.Close();
             wnd.InputText = textField.text;
             wnd.Result = ResultType.OK;
-            wnd.Close();
-        }
-        private static void CancelButtonCallback()
-        {
-            wnd.Result = ResultType.Cancel;
-            wnd.InputText = null;
-            wnd.Close();
+            
         }
     }
 }
