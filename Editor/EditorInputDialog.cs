@@ -102,14 +102,14 @@ namespace Dyternal.EditorTools.InputDialog
             if (textField.text == "") return;
 
             wnd.InputText = textField.text;
-            wnd.Close();
             wnd.Result = ResultType.OK;
+            wnd.Close();
         }
         private static void CancelButtonCallback()
         {
-            wnd.Close();
             wnd.Result = ResultType.Cancel;
             wnd.InputText = null;
+            wnd.Close();
         }
     }
 }
